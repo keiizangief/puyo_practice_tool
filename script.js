@@ -284,6 +284,7 @@ function draw() {
   drawGiveupButton();
   drawTime();
   drawHighScore();
+  drawMenuChange();
   
   if (successcount === tamadata.length) {
     drawClear();
@@ -322,6 +323,10 @@ function drawTama() {
       ctx.lineWidth = 1;
     }
   }
+}
+
+function drawMenuChange() {
+  drawShape(roundSelectButton, 19 * cellsize, 0 * cellsize, cellsize, 0, 1);
 }
 
 function drawRoundSelect() {
@@ -418,6 +423,50 @@ function drawHighScore() {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'black';
   ctx.fillText(millisecondsToTimeString(highscoreP), 17 * cellsize + (cellsize / 2), 14 * cellsize + (cellsize / 2));
+}
+
+function drawHighScorePage() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  drawShape(roundSelectButton, 19 * cellsize, 0 * cellsize, cellsize, 0, 1);
+
+  ctx.font = '32px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'black';
+  ctx.fillText('HighScore', 10 * cellsize, 1 * cellsize + (cellsize / 2));
+
+  let basex = 0;
+  let basey = 0;
+  let roundhighscore = 0;
+  let roundhighscoreP = 0;
+  for (let i = 0; i <= 9; i++) {
+    roundhighscore = getHighScore(i);
+    roundhighscoreP = getHighScoreP(i);
+    
+    basex = (3 * cellsize) + (Math.floor(i / 5) * 8 * cellsize);
+    basey = (3 * cellsize) + ((i % 5) * 2 * cellsize);
+
+    ctx.font = '16px serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'black';
+    ctx.fillText('Stage ' + i, basex, basey + (cellsize / 2));
+
+    ctx.font = '26px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'black';
+    ctx.fillText(millisecondsToTimeString(roundhighscore), basex + (4 * cellsize) + (cellsize / 2), basey + (0 * cellsize) + (cellsize / 2));
+
+    drawShape(perfectStar, basex + (2 * cellsize), basey + (1 * cellsize), cellsize, 0, 0);
+
+    ctx.font = '26px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'black';
+    ctx.fillText(millisecondsToTimeString(roundhighscoreP), basex + (4 * cellsize) + (cellsize / 2), basey + (1 * cellsize) + (cellsize / 2));
+  }
 }
 
 function millisecondsToTimeString(milliseconds) {
@@ -683,7 +732,20 @@ canvas.addEventListener('click', (event) => {
   const mapy = Math.floor(y / cellsize);
 
   switch (gamemode) {
+    case 0:
+      if ((mapx === 19) && (mapy === 0)) {
+        gamemode = 1;
+        startTime = 0;
+        mapinit();
+        draw();
+      }
+      break;
     case 1:
+      if ((mapx === 19) && (mapy === 0)) {
+        drawHighScorePage();
+        gamemode = 0;
+      }
+      
       if ((mapx === 16) && (mapy === 2) && (roundnum > 0)) {
         roundnum--;
         startTime = 0;
